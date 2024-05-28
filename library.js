@@ -16,6 +16,7 @@ const db = require.main.require('./src/database');
 const plugins = require.main.require('./src/plugins');
 
 const controllers = require('./lib/controllers');
+const { without, omit } = require('lodash');
 const nbbAuthController = require.main.require('./src/controllers/authentication');
 const logoutAsync = util.promisify((req, callback) => req.logout(callback));
 
@@ -277,7 +278,13 @@ plugin.updateUserProfile = async (uid, userData, isNewUser) => {
 		winston.debug('[session-sharing] Updating profile fields:', obj);
 		obj.uid = uid;
 		try {
-			userObj = await user.updateProfile(uid, obj);
+			userObj = await user.updateProfile(uid, omit(obj, 'email'));
+			if (obj.email) {
+				await db.setObject(`user:${uid}`, {
+					email: obj.email,
+					'email:confirmed': 1,
+				});
+			}
 
 			// If it errors out, not that big of a deal, continue anyway.
 			if (!userObj) {
@@ -346,8 +353,17 @@ async function executeJoinLeave(uid, join, leave) {
 plugin.createUser = async (userData) => {
 	winston.verbose('[session-sharing] No user found, creating a new user for this login');
 
-	const uid = await user.create(_.pick(userData, profileFields));
+	const profileFields1 = without(profileFields, 'email');
+	const uid = await user.create(_.pick(userData, profileFields1));
 	await db.sortedSetAdd(plugin.settings.name + ':uid', uid, userData.id);
+
+	if (userData.email) {
+		await db.setObject(`user:${uid}`, {
+			email: userData.email,
+			'email:confirmed': 1,
+		});
+	}
+
 	return uid;
 };
 

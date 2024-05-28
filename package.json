@@ -36,16 +36,14 @@
     ]
   },
   "dependencies": {
-    "@commitlint/cli": "^9.1.2",
     "async": "^3",
-    "eslint": "^7.7.0",
     "jsonwebtoken": "^8.5.1",
-    "lint-staged": "^10.0.9",
     "lodash": "^4.17.14"
   },
   "devDependencies": {
     "@commitlint/cli": "^9.1.2",
     "@commitlint/config-angular": "^7.1.2",
+    "@types/node": "^20.12.12",
     "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
@@ -53,5 +51,6 @@
     "lint-staged": "^10.0.9",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9"
-  }
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
